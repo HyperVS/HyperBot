@@ -22,8 +22,6 @@ module.exports = {
             streamers.forEach(streamer => {
                 embed.addField(streamer.name, streamer.link);
             })
-    
-            console.log(streamers);
             return message.channel.send(embed);
         })
         .catch((error) => console.log(error));
