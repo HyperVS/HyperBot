@@ -1,5 +1,6 @@
 const fs = require('fs');
 const Discord = require('discord.js');
+const connection = require('./db/connection');
 const { prefix } = require('./config.json');
 const client = new Discord.Client();
 
@@ -72,3 +73,7 @@ client.on('guildMemberAdd', member => {
   });
 
 client.login(process.env.BOT_TOKEN);
+
+connection.once('open', ()=>{
+	console.log('connected to db');
+});
