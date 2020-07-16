@@ -7,8 +7,9 @@ module.exports = {
 	args: true,
     private: false,
 	execute(message, args){
-        const msgs = 0;
-        Member.findOne({id: message.client.user.id}).exec()
-        .then((result) =>  message.channel.send(`You've sent ${result.msgs} msgs in this server`));
+        let msgs = 0;
+        Member.findOne({id: message.member.user.id}).exec()
+        .then((result) =>  {msgs = result.msgs})
+        .then(() =>  message.channel.send(`You've sent ${msgs} msgs in this server`))
     }
 }
