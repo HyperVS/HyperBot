@@ -3,6 +3,7 @@ const Discord = require('discord.js');
 const connection = require('./db/connection');
 const { prefix } = require('./config.json');
 const client = new Discord.Client();
+const Member = require('./models/Members');
 
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -22,7 +23,12 @@ client.on('ready', () => {
 
 
 client.on('message', message =>{
-	
+	Member.findOne({id: message.member.user.id}).exec()
+	.then((result) => {
+		result.msgs++;
+		result.save();
+	})
+
     if (!message.guild) return;
    
 	// checking if command is used
@@ -70,7 +76,15 @@ client.on('guildMemberAdd', member => {
 	const channel = member.guild.channels.cache.find(ch => ch.name === 'welcome'); // change this to the channel name you want to send the greeting to
 	if (!channel) return;
 	channel.send(`Welcome to Hyper's Hub, ${member}!`);
-  });
+	const result = Member.findOne({id: member.user.id}).exec().then((result) => result)
+	if (result == undefined || result == null) {
+		const newMember = new Member({id: member.user.id, name: member.user.username, msgs: 0});
+		console.log(newMember);
+		newMember.save()
+		.then(() => {})
+		.catch((error) => console.log(error));
+	}
+});
 
 client.login(process.env.BOT_TOKEN);
 

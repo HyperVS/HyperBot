@@ -16,7 +16,7 @@ module.exports = {
 		embed.setTitle('Here\'s a list of all streamers in the discord:');
         embed.setColor(colorOne);
 
-        Streamer.find().exec()
+        Streamer.find().sort({ name: 'asc'}).exec()
         .then(results =>  {
             streamers = [...results];
             streamers.forEach(streamer => {
