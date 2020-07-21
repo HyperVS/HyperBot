@@ -23,11 +23,16 @@ client.on('ready', () => {
 
 
 client.on('message', message =>{
+	// Count msgs
 	Member.findOne({id: message.member.user.id}).exec()
 	.then((result) => {
+		if (message.author.bot) {
+			return;
+		}
 		result.msgs++;
 		result.save();
 	})
+	.catch(error => console.log(error));
 
     if (!message.guild) return;
    
@@ -72,18 +77,27 @@ client.on('message', message =>{
 
 });
 
+// User joining the server
 client.on('guildMemberAdd', member => {
+	// Sending a greeting msg
 	const channel = member.guild.channels.cache.find(ch => ch.name === 'welcome'); // change this to the channel name you want to send the greeting to
 	if (!channel) return;
 	channel.send(`Welcome to Hyper's Hub, ${member}!`);
-	const result = Member.findOne({id: member.user.id}).exec().then((result) => result)
-	if (result == undefined || result == null) {
-		const newMember = new Member({id: member.user.id, name: member.user.username, msgs: 0});
-		console.log(newMember);
-		newMember.save()
-		.then(() => {})
-		.catch((error) => console.log(error));
-	}
+
+	// Add user to the database upon joining the server
+	Member.findOne({id: member.user.id}).exec()
+	.then((result) => {
+		console.log()
+		if (result == undefined || result == null) {
+			if (member.user.bot) {
+				return;
+			}
+			const newMember = new Member({id: member.user.id, name: member.user.username, msgs: 0});
+			newMember.save()
+			.then(() => {})
+			.catch((error) => console.log(error));
+		}
+	})
 });
 
 client.login(process.env.BOT_TOKEN);
